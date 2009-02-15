@@ -1,0 +1,10 @@
+Revision history for Perl extension HeliosX::Logger::Log4perl.
+
+0.02_0771  Sun Feb 15 12:00:00 2009
+    - HeliosX::Logger::Log4perl separated into its own distribution
+    - actually works!
+    - lots of documentation!  Some of it even coherent!
+0.01  Sat Feb 14 21:05:57 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.8.0 HeliosX::Logger::Log4perl
+

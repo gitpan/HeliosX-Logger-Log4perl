@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                HeliosX-Logger-Log4perl
+version:             0.02_0771
+abstract:            HeliosX::Logger subclass implementing logging to Log4perl for Helios
+license:             perl
+author:              
+    - Andrew Johnson <lajandy at cpan dotorg>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Helios:                        2
+    HeliosX::ExtLoggerService:     0.02
+    Log::Log4perl:                 
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
