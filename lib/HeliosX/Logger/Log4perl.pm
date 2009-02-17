@@ -10,7 +10,7 @@ use Log::Log4perl;
 use HeliosX::LogEntry::Levels qw(:all);
 use HeliosX::Logger::LoggingError;
 
-our $VERSION = '0.02_0771';
+our $VERSION = '0.02_0811';
 
 =head1 NAME
 
@@ -151,8 +151,7 @@ sub logMsg {
     }   
 
     # assemble message from the parts we have
-    $msg = $self->getJobType().' ('.$self->getHostname.') '.$msg;
-    if ( defined($job) ) { $msg = 'Job:'.$job->getJobid().' '.$msg; }
+    $msg = $self->assembleMsg($job, $level, $msg);
 
     # we shouldn't have to do a level check, since 
     # HeliosX::ExtLoggerService->logMsg() will default the level to LOG_INFO
@@ -174,6 +173,26 @@ sub logMsg {
         $logger->info($msg);
     }
     return 1;
+}
+
+
+=head2 assembleMsg($job, $priority_level, $msg)
+
+Given the information passed to logMsg(), assembleMsg() returns the text 
+string to be logged to the Log4perl category.  Separating this step into its 
+own method allows you to easily override the default message format if you so 
+choose.  Simply subclass HeliosX::Logger::Log4perl and override assembleMsg() 
+with your own message formatting method.
+
+=cut
+
+sub assembleMsg {
+	my ($self, $job, $level, $msg) = @_;
+    if ( defined($job) ) { 
+    	return 'Job:'.$job->getJobid().' '.$self->getJobType().' ('.$self->getHostname.') '.$msg;
+    } else {
+    	return $self->getJobType().' ('.$self->getHostname.') '.$msg;
+    }
 }
 
 

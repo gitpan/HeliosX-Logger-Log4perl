@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                HeliosX-Logger-Log4perl
-version:             0.02_0771
+version:             0.02_0811
 abstract:            HeliosX::Logger subclass implementing logging to Log4perl for Helios
 license:             perl
 author:              
