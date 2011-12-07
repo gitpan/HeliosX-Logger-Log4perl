@@ -1,20 +1,20 @@
 package HeliosX::Logger::Log4perl;
 
 use 5.008;
-use base qw(HeliosX::Logger);
+use base qw(Helios::Logger);
 use strict;
 use warnings;
 
 use Log::Log4perl;
 
-use HeliosX::LogEntry::Levels qw(:all);
-use HeliosX::Logger::LoggingError;
+use Helios::LogEntry::Levels qw(:all);
+use Helios::Error::LoggingError;
 
-our $VERSION = '0.02_0811';
+our $VERSION = '0.03_4931';
 
 =head1 NAME
 
-HeliosX::Logger::Log4perl - HeliosX::Logger subclass implementing logging to Log4perl for Helios
+HeliosX::Logger::Log4perl - Helios::Logger subclass implementing logging to Log4perl for Helios
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,8 @@ HeliosX::Logger::Log4perl - HeliosX::Logger subclass implementing logging to Log
  log4perl_watch_interval=10
  
  # log4perl supports lots of options, so you can get creative
- # log everything to log4perl, but specify which services go to which categories
+ # e.g. log everything to log4perl, 
+ # but specify which services go to which categories
  [global]
  internal_logging=off
  loggers=HeliosX::Logger::Log4perl
@@ -44,9 +45,8 @@ HeliosX::Logger::Log4perl - HeliosX::Logger subclass implementing logging to Log
 
 =head1 DESCRIPTION
 
-This class extends the HeliosX::Logger class to provide a shim between HeliosX::ExtLoggerService 
-and Log::Log4perl.  This allows Helios applications using HeliosX::ExtLoggerService to use 
-Log4perl logging facilities.
+This class implements a Helios::Logger class to provide Helios applications  
+the logging capabilities of Log4perl.
 
 For information about configuring Log4perl, see the L<Log::Log4perl> documentation.
 
@@ -54,26 +54,32 @@ For information about configuring Log4perl, see the L<Log::Log4perl> documentati
 
 =head2 log4perl_conf [REQUIRED]
 
-The location of the Log4perl configuration file.  This can be one conf file for all of your 
-HeliosX::ExtLoggerService services (specified in the [global] section), or you can have 
-different conf files for different services.  
+The location of the Log4perl configuration file.  If specified in your 
+helios.ini [global] section, the conf file will apply to all of your 
+Helios services.  You may also configure different conf files for specific 
+services by placing the log4perl_conf line in an individual service's 
+helios.ini section.
 
 See the Log4perl documentation for details about configuring Log4perl itself.
 
 =head2 log4perl_category 
 
-The Log4perl "category" to log messages for this service.  You can declare this only in the 
-[global] section, which will cause all HeliosX::ExtLoggerService services to log to one 
-category.  Or, you can declare it in the [global] section and in certain individual service 
-sections, which will allow certain services to log to their own category but others to default
-to the global one.  If not specified, the Log4perl category will default to the service 
-name/jobtype (from getJobType()).
+The Log4perl "category" to log messages for this service.  If declared in your 
+helios.ini [global] section, all Helios services will send log messages to the 
+specified category.  If specified in a single service's section, only that 
+service will send log messages to the specified category.  You may also declare
+a default category in the [global] section, and specific categories for 
+particular Helios services, allowing certain services to log to their own 
+category but others to default to the global one.  
+
+If log4perl_category is not specified, the Log4perl category will default to 
+the service name/jobtype (from getJobType()).
 
 =head2 log4perl_watch_interval
 
-If specified, Log4perl will reread the log4perl_conf file every specified number of seconds 
-and update its configuration accordingly.  If this isn't specified, any changes to your conf file 
-will require a service restart.
+If specified, Log4perl will reread the log4perl_conf file after the given 
+number of seconds and update its configuration accordingly.  If this isn't 
+specified, any changes to your conf file will require a service restart.
 
 =head1 IMPLEMENTED METHODS
 
@@ -90,7 +96,7 @@ sub init {
     my $config = $self->getConfig();
 
     unless ( defined($config->{log4perl_conf}) && (-r $config->{log4perl_conf}) ) {
-        throw HeliosX::Logger::LoggingError('CONFIGURATION ERROR: log4perl_conf not defined');
+        throw Helios::Error::LoggingError('CONFIGURATION ERROR: log4perl_conf not defined or cannot be read');
     }
     
     if ( defined($config->{log4perl_watch_interval}) ) {
@@ -109,15 +115,15 @@ $priority_level.
 
 =head3 Priority Translation
 
-Helios was originally developed using Sys::Syslog as its sole logging system.  It eventually 
-developed its own internal logging subsystem, and HeliosX::ExtLoggingService and HeliosX::Logger 
-are new developments to further modularize Helios's logging capabilities and make it useful 
-in more environments.  Due to this history, however, the base Helios system and 
-HeliosX::ExtLoggerService define 8 logging priorities versus Log4perl's 5.  
-HeliosX::Logger::Log4perl translates on-the-fly several of the priority levels defined in 
-HeliosX::LogEntry::Levels to Log4perl's levels:
+Helios was originally developed using Sys::Syslog as its primary logging 
+system.  It eventually developed its own internal logging subsystem, and 
+Helios 2.30 added the Helios::Logger interface to further modularize Helios's 
+logging capabilities and make it useful in more environments.  Due to this 
+history, however, Helios defines 8 logging priorities versus Log4perl's 5.  
+HeliosX::Logger::Log4perl translates on-the-fly several of the priority levels 
+defined in Helios::LogEntry::Levels to Log4perl's levels:
 
- HeliosX::LogEntry::Levels  Log::Log4perl::Level
+ Helios::LogEntry::Levels   Log::Log4perl::Level
  LOG_EMERG                  $FATAL
  LOG_ALERT                  $FATAL
  LOG_CRIT                   $FATAL
@@ -154,19 +160,19 @@ sub logMsg {
     $msg = $self->assembleMsg($job, $level, $msg);
 
     # we shouldn't have to do a level check, since 
-    # HeliosX::ExtLoggerService->logMsg() will default the level to LOG_INFO
+    # Helios::Service->logMsg() will default the level to LOG_INFO
     # still, it can't hurt
     if ( defined($level) ) {
         SWITCH: {
-            if ($level eq LOG_DEBUG) { $logger->debug($msg); last SWITCH; }
-            if ($level eq LOG_INFO || $level eq LOG_NOTICE) { $logger->info($msg); last SWITCH; }
-            if ($level eq LOG_WARNING) { $logger->warn($msg); last SWITCH; }
-            if ($level eq LOG_ERR) { $logger->error($msg); last SWITCH; }
-            if ($level eq LOG_CRIT || $level eq LOG_ALERT || $level eq LOG_EMERG) { 
-                $logger->fatal($msg); 
-                last SWITCH; 
-            }
-            throw HeliosX::Logger::LoggingError('Invalid log level '.$level);           
+            if ($level eq LOG_DEBUG)      { $logger->debug($msg); last SWITCH; }
+            if ($level eq LOG_INFO 
+                || $level eq LOG_NOTICE)  { $logger->info($msg); last SWITCH; }
+            if ($level eq LOG_WARNING)    { $logger->warn($msg); last SWITCH; }
+            if ($level eq LOG_ERR)        { $logger->error($msg); last SWITCH; }
+            if ($level eq LOG_CRIT 
+                || $level eq LOG_ALERT 
+                || $level eq LOG_EMERG)   { $logger->fatal($msg); last SWITCH; }
+            throw Helios::Error::LoggingError('Invalid log level '.$level);           
         }
     } else {
         # $level wasn't defined, so we'll default to INFO
@@ -203,7 +209,7 @@ __END__
 
 =head1 SEE ALSO
 
-L<HeliosX::ExtLoggerService>, L<HeliosX::Logger>, L<Log::Log4perl>
+L<Helios::Service>, L<HeliosX::Logger>, L<Log::Log4perl>
 
 =head1 AUTHOR
 
@@ -211,7 +217,7 @@ Andrew Johnson, E<lt>lajandy at cpan dotorgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Andrew Johnson
+Copyright (C) 2009-11 by Andrew Johnson
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,
