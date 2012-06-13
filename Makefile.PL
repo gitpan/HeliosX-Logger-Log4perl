@@ -7,7 +7,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/HeliosX/Logger/Log4perl.pm', # finds $VERSION
     LICENSE           => 'perl',    
     PREREQ_PM         => {
-    	                   Helios         => 2.30,
+    	                   Helios         => 2.40,
     	                   Log::Log4perl  => ''
                          }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005

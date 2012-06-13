@@ -1,4 +1,4 @@
-HeliosX-Logger-Log4perl version 0.02
+HeliosX-Logger-Log4perl version 0.04
 ====================================
 
 HeliosX::Logger::Log4perl implements a Helios::Logger class to provide 
@@ -20,13 +20,13 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Helios 2.30 or newer
+  Helios 2.40 or newer
   Log::Log4perl 
 
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-11 by Andrew Johnson, except as noted.
+Copyright (C) 2009-12 by Andrew Johnson, except as noted.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

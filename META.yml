@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               HeliosX-Logger-Log4perl
-version:            0.03_4931
+version:            0.05_2431
 abstract:           Helios::Logger subclass implementing logging to Log4perl for Helios
 author:
     - Andrew Johnson <lajandy at cpan dotorg>
@@ -11,7 +11,7 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Helios:         2.3
+    Helios:         2.4
     Log::Log4perl:  
 no_index:
     directory:
