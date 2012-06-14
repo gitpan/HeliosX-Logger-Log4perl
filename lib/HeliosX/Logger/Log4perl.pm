@@ -10,7 +10,7 @@ use Log::Log4perl;
 use Helios::LogEntry::Levels qw(:all);
 use Helios::Error::LoggingError;
 
-our $VERSION = '0.05_2431';
+our $VERSION = '1.00';
 
 =head1 NAME
 
